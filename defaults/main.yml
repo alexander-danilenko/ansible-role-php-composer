@@ -1,0 +1,23 @@
+---
+# List of packages that will be installed.
+# Note: this list needs to be distro-agnostic and all these packages needs to be
+# available in most linux distros.
+php_packages:
+  - 'php-common'
+  - 'php-apcu'
+  - 'php-bcmath'
+  - 'php-cli'
+  - 'php-curl'
+  - 'php-gd'
+  - 'php-imagick'
+  - 'php-intl'
+  - 'php-json'
+  - 'php-mbstring'
+  - 'php-opcache'
+  - 'php-xml'
+  - 'php-zip'
+php_extra_packages: []
+
+php_composer_install_dir: '/usr/local/bin'
+php_composer_home_dir: '{{ ansible_env.HOME }}/.composer'
+php_composer_global_packages: []

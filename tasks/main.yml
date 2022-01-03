@@ -1,0 +1,59 @@
+---
+
+- name: 'Install PHP packages'
+  become: yes
+  package:
+    state: present
+    name: '{{ php_packages }}'
+
+- name: 'Install PHP extra packages'
+  when: php_extra_packages|length > 0
+  become: yes
+  package:
+    state: present
+    name: '{{ php_extra_packages }}'
+
+- name: 'Download composer'
+  become: yes
+  get_url:
+    url: 'https://getcomposer.org/composer-stable.phar'
+    dest: '{{ php_composer_install_dir }}/composer'
+    mode: '0755'
+
+- name: 'Create composer home directories'
+  file:
+    path: '{{ item }}'
+    state: 'directory'
+  with_items:
+    - '{{ php_composer_home_dir }}'
+    - '{{ php_composer_home_dir }}/vendor'
+    - '{{ php_composer_home_dir }}/vendor/bin'
+
+- name: 'Make sure `tree` package is installed'
+  when: php_composer_global_packages|length > 0
+  become: yes
+  package:
+    name: 'tree'
+    state: 'present'
+
+- name: 'List composer global packages installed'
+  when: php_composer_global_packages|length > 0
+  shell: 'tree {{ php_composer_home_dir }}/vendor/ -d -f -L 2'
+  register: php_composer_global_packages_installed
+
+- name: 'Install global packages'
+  loop: '{{ php_composer_global_packages }}'
+  when: php_composer_global_packages_installed.stdout.find(item) == -1
+  shell: 'composer global require {{ item }}'
+  args:
+    executable: '/bin/bash'
+
+- name: 'Enable "Drupal" code sniffer standards'
+  when: php_composer_global_packages|length > 0 and 'drupal/coder' in php_composer_global_packages
+  synchronize:
+    src: '{{ php_composer_home_dir }}/vendor/drupal/coder/coder_sniffer/{{ item }}'
+    dest: '{{ php_composer_home_dir }}/vendor/squizlabs/php_codesniffer/src/Standards'
+    recursive: yes
+  with_items:
+    - 'Drupal'
+    - 'DrupalPractice'
