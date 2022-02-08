@@ -43,7 +43,7 @@
 
 - name: 'Install global packages'
   loop: '{{ php_composer_global_packages }}'
-  when: php_composer_global_packages_installed.stdout.find(item) == -1
+  when: php_composer_global_packages_installed.changed and php_composer_global_packages_installed.stdout.find(item) == -1
   shell: 'composer global require {{ item }}'
   args:
     executable: '/bin/bash'
