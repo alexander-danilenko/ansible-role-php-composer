@@ -49,7 +49,7 @@
     executable: '/bin/bash'
 
 - name: 'Enable "Drupal" code sniffer standards'
-  when: php_composer_global_packages|length > 0 and 'drupal/coder' in php_composer_global_packages
+  when: not ansible_check_mode and php_composer_global_packages|length > 0 and 'drupal/coder' in php_composer_global_packages
   synchronize:
     src: '{{ php_composer_home_dir }}/vendor/drupal/coder/coder_sniffer/{{ item }}'
     dest: '{{ php_composer_home_dir }}/vendor/squizlabs/php_codesniffer/src/Standards'
